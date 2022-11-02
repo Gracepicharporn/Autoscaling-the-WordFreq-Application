@@ -8,4 +8,4 @@ The WordFreq application is used for counting the top ten words in the text file
 
 
 
-![alt text for screen readers]
+![alt text for screen readers](1.jpeg)
