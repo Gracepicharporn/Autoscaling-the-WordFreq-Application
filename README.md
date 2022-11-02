@@ -71,7 +71,7 @@ Go back to the Auto Scaling Group page and then choose the labcoursework-autosca
 * CloudWatch alarm: labcoursework-addcapacity (When matric is greater 30 for 1 min and it will breach the alarm threshold to add 1 capacity)
 * Action: Add 1 capacity unit     
 * And then wait: 300 (cool down period)  
-     
+
 **4.2 Create policy for removing capacity**    
 * Policy type: Simple scaling     
 * Scaling policy name: labcoursework-policy-removecapacity
