@@ -2,6 +2,8 @@
 
 This project uses Amazon Web Services (AWS) to set up autoscaling for the WordFreq application so that many files could be uploaded to the AWS S3 bucket faster. The details of this application and the architecture are outlined as below:
 
+***NOTE!: this project worked on Amazon Web Services (AWS) but, in this repository provided only the instrcution how to set up this application only***
+
 # The WordFreq Application
 
 The WordFreq application is used for counting the top ten words in the text file. This service has four parts, namely Amazon EC2, Amazon DynamoDB, Amazon S3, SQS Queues. After uploading files to S3 bucket, the massage for uploading files and location of files will send to the first SQS Queues known as “jobs”. The message in flight of this queues will appear which means being processed by the application and 1 massage represents the 1 file. The message available will appear which mean the process is finished. And then, EC2 will check the result of the message in SQS Queues to find the specific location file. Next, it will get the file from the S3 bucket for processing. Finally, it writes the result to the DynamoDB Table and the second Queues called “results”. The second massage Queues will appear the number on message in flight and message available which means the process of counting words. In DynamoDB Table will show the map of the common top 10 words in each file.
@@ -81,3 +83,32 @@ Go back to the Auto Scaling Group page and then choose the labcoursework-autosca
 
 This application start process at 13.11.02 pm. It took 28.17 minutes before launching a new EC2 when the added capacity was triggered because this metric exceeds than 20 and used 33 sec for the process instance. However, this application uses 43 sec for removing capacity to 1 instance and took around 28.8 min before terminating after finished process so, this process for auto-scaling was too long and not good for implementation. It should process auto-scaling when uploading file so, I will modify the auto-scaling in the next session.
 ![alt text for screen readers](images/EC2.jpg)
+
+# Improve the scaling operation
+
+This section improved the auto scaling from the previous section.  
+The implementation were divied into three parts as follows:
+
+### 1. Adjust the threshold value
+![alt text for screen readers](images/threshold.jpg)
+
+Summing it up, the threshold value affects the auto-scaling. If this metric didn’t exceed or go below the setting value, the instance in auto-scaling will not launch. Consequently, in this application I choose the threshold value which is Add capacity: Grater 5 Remove Capacity: Less Equal 3 due to short run time process file and the launch/terminate instance quickly after upload files.
+
+### 2. Modify the maximum capacity in Auto scaling Groups
+
+Go to Auto scaling Groups and set the maximum capacity to 4
+![alt text for screen readers](images/maxcapacity.jpg)
+
+From this result, the file process time was 4.33 minute, and it took the 1.02 to launch and 43 second to terminate instance so, it uses time around the same as the 2 maximum capacity and don’t affect the process time too much. The 2 maximum capacity is better than 4 because of saving the cost of launching instances.
+
+### 3. Vary the cooldown periods in Auto Scaling Group
+![alt text for screen readers](images/cooldown.jpg)
+To summarize, the cooldown prevents to launch or terminate instance before the previous process carry out. In this case, the 150-cooldown value is the best performance to launch adding new instance quickly and terminate when the process doesn’t need it. The file process time is 5.24 which is the fastest time in 150 cooldowns.
+
+### 4. Try to use another instance type
+![alt text for screen readers](images/Instance.jpg)
+To conclude, t2.large is the best instance for running this application. Moreover, this instance takes time before launching a new instance and process instance about 1 minute. It terminated the instance quickly but not immediately.
+
+### 5. Explore more metrics
+![alt text for screen readers](images/metrics.jpg)
+From this figure, NumberOfEmptyReceives performed only when uploading file to S3 bucket, the other metric performs slowly than this metric. Thus, I choose this metric to process this application
