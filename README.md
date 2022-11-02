@@ -27,7 +27,8 @@ In this task, this application needs to add the Amazon Auto Scaling to the appli
 * IAM instance profile: EMR_EC2_DefaultRole
 * Monitoring: Select Enable EC2 instance detailed monitoring within CloudWatch 
 * Security Group: choose a new security group and SSH (port22)
-* Key pair: choose the learnerlab-keypair.pem
+* Key pair: choose the learnerlab-keypair.pem  
+
 **2. Create the Auto Scaling Groups**
 * Name: labcoursework-autoscaling
 * Lunch Configuration: coursework-configuration
@@ -37,9 +38,11 @@ In this task, this application needs to add the Amazon Auto Scaling to the appli
 * Health Checks: 300 second (health check for EC2 instance)
 * Monitoring: Select Enable group metric collection within CloudWatch (The metric will monitor in a CloudWatch)
 * Group size: Desired capacity: 1 (There are minimum one instance to process application), Minimum capacity: 1 (There are minimum one instance to process application), Maximum capacity: 2
-* Scaling policy: None Tag, Key: Name, Value: worldsequent
-**3. Set up the CloudWatch**     
-3.1 Create the first alarms for adding capacity Metric:
+* Scaling policy: None Tag, Key: Name, Value: worldsequent  
+
+**3. Set up the CloudWatch**  
+    
+**3.1 Create the first alarms for adding capacity Metric:**
 * Choose the SQS (It has the SQS in the application so, it is suitable for choosing matric from the SQS and attached it with SQS)
 * Select QueueName: wordfreq-job
 * Matric Name: NumberOfMessagesReceived
@@ -48,23 +51,28 @@ In this task, this application needs to add the Amazon Auto Scaling to the appli
 * Period: 1 minutes (The alarm will trigger within 1 minute, if the metric value is above the threshold value)
 * Condition: Threshold type: Static, Greater 20 (If the metric exceeds than 20, the alarm will trigger)
 * Alarm Name: labcoursework-addcapacity
-3.2 Create the second alarms for removing capacity
+
+**3.2 Create the second alarms for removing capacity**
 * Metric: Choose the SQS
 * Select QueueName: wordfreq-job
 * Matric Name: NumberOfMessagesReceived
 * Matric name: NumberOfEmptyReceives Statistic: Sum
 * Period: 1 minutes
 * Condition: Threshold type: Static, Lower/Equal 10 (If the metric value is below than 10, the alarm will trigger)
-* Alarm Name: labcoursework-removecapacity
-**4. Create simple scaling policies.**
-Go back to the Auto Scaling Group page and then choose the labcoursework-autoscaling After that click Automatic scaling and then create Dynamic scaling policies
-4.1 Create policy for adding capacity
+* Alarm Name: labcoursework-removecapacity  
+
+**4. Create simple scaling policies.**  
+
+Go back to the Auto Scaling Group page and then choose the labcoursework-autoscaling After that click Automatic scaling and then create Dynamic scaling policies  
+
+**4.1 Create policy for adding capacity**
 * Policy type: Simple scaling
 * Scaling policy name: labcoursework-policy-addcapacity
 * CloudWatch alarm: labcoursework-addcapacity (When matric is greater 30 for 1 min and it will breach the alarm threshold to add 1 capacity)
 * Action: Add 1 capacity unit     
-* And then wait: 300 (cool down period)     
-4.2 Create policy for removing capacity    
+* And then wait: 300 (cool down period)  
+     
+**4.2 Create policy for removing capacity**    
 * Policy type: Simple scaling     
 * Scaling policy name: labcoursework-policy-removecapacity
 * CloudWatch alarm: labcoursework-addcapacity (When matric is less than 10 for 5 min and it will breaches the alarm threshold to remove 1 capacity)
